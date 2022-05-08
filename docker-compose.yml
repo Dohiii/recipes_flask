@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+
+  recipes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: ['/usr/src/app/entrypoint.sh']
+    volumes:
+      - '.:/usr/src/app'
+    ports:
+      - 5004:5000
+    environment:
+      - FLASK_ENV=development
+      - APP_SETTINGS=src.config.DevelopmentConfig
+      - DATABASE_URL=postgresql://postgres:postgres@recipes-db:5432/recipes_dev
+      - DATABASE_TEST_URL=postgresql://postgres:postgres@recipes-db:5432/recipes_test
+    depends_on:
+      - recipes-db
+
+  recipes-db:
+    build:
+      context: ./src/db
+      dockerfile: Dockerfile
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
